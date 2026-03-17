@@ -1,0 +1,114 @@
+import {
+  Shield, LayoutDashboard, AlertTriangle, Server, FileText, BarChart3,
+  Bot, Settings, LogOut, Eye
+} from "lucide-react";
+import { NavLink } from "@/components/NavLink";
+import { useLocation } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import {
+  Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
+  SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarHeader, SidebarFooter,
+  useSidebar,
+} from "@/components/ui/sidebar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+
+const mainItems = [
+  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
+  { title: "Threats", url: "/threats", icon: AlertTriangle },
+  { title: "Endpoints", url: "/endpoints", icon: Server },
+  { title: "Reports", url: "/reports", icon: FileText },
+  { title: "Analytics", url: "/analytics", icon: BarChart3 },
+  { title: "AI Assistant", url: "/chatbot", icon: Bot },
+];
+
+const adminItems = [
+  { title: "Admin Panel", url: "/admin", icon: Settings },
+];
+
+export function AppSidebar() {
+  const { state } = useSidebar();
+  const collapsed = state === "collapsed";
+  const location = useLocation();
+  const { profile, isAdmin, signOut, user } = useAuth();
+
+  const isActive = (path: string) => location.pathname === path;
+  const initials = profile?.display_name?.slice(0, 2).toUpperCase() || user?.email?.slice(0, 2).toUpperCase() || "U";
+
+  return (
+    <Sidebar collapsible="icon">
+      <SidebarHeader className="border-b border-border pb-4">
+        <div className="flex items-center gap-2 px-2">
+          <div className="flex items-center justify-center w-8 h-8 rounded-md bg-primary/10">
+            <Eye className="w-5 h-5 text-primary" />
+          </div>
+          {!collapsed && (
+            <div className="flex flex-col">
+              <span className="text-sm font-bold tracking-wider text-primary cyber-glow-text">CYBER EYE</span>
+              <span className="text-[10px] text-muted-foreground">Zero Trust Monitor</span>
+            </div>
+          )}
+        </div>
+      </SidebarHeader>
+
+      <SidebarContent className="scrollbar-thin">
+        <SidebarGroup>
+          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {mainItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild isActive={isActive(item.url)} tooltip={item.title}>
+                    <NavLink to={item.url} end className="hover:bg-muted/50" activeClassName="bg-primary/10 text-primary font-medium">
+                      <item.icon className="h-4 w-4" />
+                      {!collapsed && <span>{item.title}</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {isAdmin && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Administration</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {adminItems.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild isActive={isActive(item.url)} tooltip={item.title}>
+                      <NavLink to={item.url} end className="hover:bg-muted/50" activeClassName="bg-primary/10 text-primary font-medium">
+                        <item.icon className="h-4 w-4" />
+                        {!collapsed && <span>{item.title}</span>}
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
+      </SidebarContent>
+
+      <SidebarFooter className="border-t border-border pt-2">
+        <div className="flex items-center gap-2 px-2">
+          <Avatar className="h-7 w-7 border border-primary/30">
+            <AvatarFallback className="bg-primary/10 text-primary text-xs">{initials}</AvatarFallback>
+          </Avatar>
+          {!collapsed && (
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-medium truncate">{profile?.display_name || user?.email}</p>
+              <p className="text-[10px] text-muted-foreground truncate">{isAdmin ? "Admin" : "Analyst"}</p>
+            </div>
+          )}
+          {!collapsed && (
+            <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive" onClick={signOut}>
+              <LogOut className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
+      </SidebarFooter>
+    </Sidebar>
+  );
+}
