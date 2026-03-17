@@ -1,16 +1,27 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { motion } from "framer-motion";
 
-// IMPORTANT: Fully REPLACE this with your own code
-const PlaceholderIndex = () => {
-  // PLACEHOLDER: Replace this entire return statement with the user's app.
-  // The inline background color is intentionally not part of the design system.
+const Index = () => {
   return (
-    <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#fcfbf8' }}>
-      <img data-lovable-blank-page-placeholder="REMOVE_THIS" src="/placeholder.svg" alt="Your app will live here!" />
-    </div>
+    <main className="min-h-svh w-full flex items-center justify-center bg-background selection:bg-foreground selection:text-background">
+      <motion.h1
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{
+          duration: 1.4,
+          ease: [0.16, 1, 0.3, 1],
+          delay: 0.2,
+        }}
+        whileHover={{
+          scale: 1.03,
+          transition: { type: "spring", stiffness: 300, damping: 15 },
+        }}
+        className="text-[clamp(5rem,15vw,12rem)] font-medium tracking-[-0.04em] text-foreground antialiased cursor-default select-none"
+        style={{ fontFamily: "'Schibsted Grotesk', sans-serif" }}
+      >
+        hi
+      </motion.h1>
+    </main>
   );
 };
-
-const Index = PlaceholderIndex;
 
 export default Index;
