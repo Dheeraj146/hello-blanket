@@ -61,7 +61,7 @@ export function generateReportPDF(data: ReportData) {
     doc.setPage(i);
     doc.setFontSize(7);
     doc.setTextColor(150, 150, 150);
-    doc.text(`Cyber Eye - Confidential | Page ${i} of ${pageCount}`, 14, 287);
+    doc.text(`NAZAR - Confidential | Page ${i} of ${pageCount}`, 14, 287);
   }
 
   doc.save(`${data.title.replace(/\s+/g, "_")}_${Date.now()}.pdf`);
