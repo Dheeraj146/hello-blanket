@@ -30,6 +30,11 @@ export function FloatingAIBot() {
 
   const sendMessage = async (content: string) => {
     if (!content.trim()) return;
+    if (content.trim().toLowerCase() === "clear") {
+      setMessages([]);
+      setInput("");
+      return;
+    }
     const newMessages: Message[] = [...messages, { role: "user", content }];
     setMessages(newMessages);
     setInput("");

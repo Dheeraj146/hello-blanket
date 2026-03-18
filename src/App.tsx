@@ -19,6 +19,11 @@ import Analytics from "./pages/Analytics";
 import Admin from "./pages/Admin";
 import EmailMonitor from "./pages/EmailMonitor";
 import NotFound from "./pages/NotFound";
+import EmailMonitoringFeature from "./pages/features/EmailMonitoringFeature";
+import ThreatDetectionFeature from "./pages/features/ThreatDetectionFeature";
+import EndpointMonitoringFeature from "./pages/features/EndpointMonitoringFeature";
+import ReportsAnalyticsFeature from "./pages/features/ReportsAnalyticsFeature";
+import RoleBasedAccessFeature from "./pages/features/RoleBasedAccessFeature";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +39,11 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/login" element={<Login />} />
               <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/features/email-monitoring" element={<EmailMonitoringFeature />} />
+              <Route path="/features/threat-detection" element={<ThreatDetectionFeature />} />
+              <Route path="/features/endpoint-monitoring" element={<EndpointMonitoringFeature />} />
+              <Route path="/features/reports-analytics" element={<ReportsAnalyticsFeature />} />
+              <Route path="/features/role-based-access" element={<RoleBasedAccessFeature />} />
 
               <Route element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
                 <Route path="/dashboard" element={<Dashboard />} />

@@ -28,7 +28,7 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "nvidia/nemotron-3-super-120b-a12b:free",
+        model: "nvidia/llama-nemotron-embed-vl-1b-v2:free",
         messages: [
           {
             role: "system",
