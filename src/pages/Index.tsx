@@ -1,24 +1,27 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Shield, Mail, Server, BarChart3, Lock, ShieldAlert } from "lucide-react";
 import { motion } from "framer-motion";
+import { FeatureExplanationDialog, type FeatureKey } from "@/components/FeatureExplanation";
 
 const features = [
-  { icon: Mail, title: "Email Monitoring", desc: "Track all sent & received emails across SMTP, IMAP, and Exchange protocols" },
-  { icon: ShieldAlert, title: "Threat Detection", desc: "Real-time phishing, spam, malware, and spoofing detection" },
-  { icon: Server, title: "Endpoint Monitoring", desc: "Continuous surveillance of all network endpoints" },
-  { icon: BarChart3, title: "Analytics & Reports", desc: "Comprehensive security analytics with PDF exports" },
-  { icon: Lock, title: "Role-Based Access", desc: "Admin, analyst, and viewer role controls" },
+  { icon: Mail, title: "Email Monitoring", desc: "Track all sent & received emails across SMTP, IMAP, and Exchange protocols", featureKey: "email-monitoring" as FeatureKey },
+  { icon: ShieldAlert, title: "Threat Detection", desc: "Real-time phishing, spam, malware, and spoofing detection", featureKey: "threat-detection" as FeatureKey },
+  { icon: Server, title: "Endpoint Monitoring", desc: "Continuous surveillance of all network endpoints", featureKey: "endpoint-monitoring" as FeatureKey },
+  { icon: BarChart3, title: "Analytics & Reports", desc: "Comprehensive security analytics with PDF exports", featureKey: null },
+  { icon: Lock, title: "Role-Based Access", desc: "Admin, analyst, and viewer role controls", featureKey: null },
 ];
 
 export default function Index() {
   const navigate = useNavigate();
+  const [openFeature, setOpenFeature] = useState<FeatureKey | null>(null);
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-primary/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-0 w-[600px] h-[300px] bg-cyber-purple/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-0 w-[600px] h-[300px] bg-destructive/5 rounded-full blur-3xl" />
       </div>
 
       <header className="relative z-10 flex items-center justify-between p-6 max-w-6xl mx-auto">
@@ -34,11 +37,11 @@ export default function Index() {
       <main className="relative z-10 max-w-6xl mx-auto px-6 pt-20 pb-32 text-center">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
           <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-4">
-            <span className="text-primary cyber-glow-text">Email Security</span>{" "}
-            <span className="text-foreground">Monitor</span>
+            <span className="text-primary cyber-glow-text">Zero Trust</span>{" "}
+            <span className="text-foreground">Monitoring</span>
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
-            Enterprise-grade email security monitoring with real-time threat detection, protocol analysis, and AI-powered insights for your domain.
+            Enterprise-grade zero trust security monitoring with real-time threat detection, email surveillance, and AI-powered insights for your domain.
           </p>
           <div className="flex gap-3 justify-center">
             <Button size="lg" onClick={() => navigate("/login")} className="font-semibold">
@@ -50,11 +53,25 @@ export default function Index() {
         <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.6 }}
           className="mt-24 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto text-left">
           {features.map((f) => (
-            <div key={f.title} className="p-5 rounded-xl bg-card/50 border border-border/30 hover:border-primary/30 transition-colors group">
-              <f.icon className="h-8 w-8 text-primary mb-3 group-hover:scale-110 transition-transform" />
-              <h3 className="font-semibold mb-1">{f.title}</h3>
-              <p className="text-sm text-muted-foreground">{f.desc}</p>
-            </div>
+            f.featureKey ? (
+              <FeatureExplanationDialog
+                key={f.title}
+                featureKey={f.featureKey}
+                trigger={
+                  <div className="p-5 rounded-xl bg-card/50 border border-border/30 hover:border-primary/30 transition-colors group cursor-pointer">
+                    <f.icon className="h-8 w-8 text-primary mb-3 group-hover:scale-110 transition-transform" />
+                    <h3 className="font-semibold mb-1">{f.title}</h3>
+                    <p className="text-sm text-muted-foreground">{f.desc}</p>
+                  </div>
+                }
+              />
+            ) : (
+              <div key={f.title} className="p-5 rounded-xl bg-card/50 border border-border/30 hover:border-primary/30 transition-colors group">
+                <f.icon className="h-8 w-8 text-primary mb-3 group-hover:scale-110 transition-transform" />
+                <h3 className="font-semibold mb-1">{f.title}</h3>
+                <p className="text-sm text-muted-foreground">{f.desc}</p>
+              </div>
+            )
           ))}
         </motion.div>
       </main>
