@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Bot, Send, X, User, Loader2, MessageSquare } from "lucide-react";
+import { Bot, Send, X, User, Loader2, MessageSquare, Trash2 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -57,7 +57,7 @@ export function FloatingAIBot() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="fixed bottom-20 right-4 z-50 w-[380px] h-[500px] rounded-xl border border-border bg-card shadow-2xl shadow-primary/10 flex flex-col overflow-hidden"
+            className="fixed bottom-20 left-4 z-50 w-[380px] h-[500px] rounded-xl border border-border bg-card shadow-2xl shadow-primary/10 flex flex-col overflow-hidden"
           >
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-secondary/30">
@@ -67,12 +67,25 @@ export function FloatingAIBot() {
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-foreground">NAZAR AI</p>
-                  <p className="text-[10px] text-muted-foreground">Email Security Assistant</p>
+                  <p className="text-[10px] text-muted-foreground">Security Assistant</p>
                 </div>
               </div>
-              <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-foreground" onClick={() => setOpen(false)}>
-                <X className="h-4 w-4" />
-              </Button>
+              <div className="flex items-center gap-1">
+                {messages.length > 0 && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 px-2 text-destructive hover:bg-destructive/10 hover:text-destructive text-[10px] font-semibold gap-1"
+                    onClick={() => setMessages([])}
+                  >
+                    <Trash2 className="h-3 w-3" />
+                    Clear
+                  </Button>
+                )}
+                <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-foreground" onClick={() => setOpen(false)}>
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
 
             {/* Messages */}
@@ -99,7 +112,7 @@ export function FloatingAIBot() {
                   )}
                   <div className={`max-w-[80%] rounded-lg p-2.5 text-xs ${m.role === "user" ? "bg-primary text-primary-foreground" : "bg-secondary/50 border border-border/50"}`}>
                     {m.role === "assistant" ? (
-                      <div className="prose prose-invert prose-xs max-w-none [&_p]:my-0.5 [&_li]:my-0">
+                      <div className="prose prose-sm max-w-none dark:prose-invert [&_p]:my-0.5 [&_li]:my-0">
                         <ReactMarkdown>{m.content}</ReactMarkdown>
                       </div>
                     ) : m.content}
@@ -121,7 +134,7 @@ export function FloatingAIBot() {
 
             {/* Input */}
             <form onSubmit={(e) => { e.preventDefault(); sendMessage(input); }} className="flex gap-2 p-3 border-t border-border">
-              <Input value={input} onChange={(e) => setInput(e.target.value)} placeholder="Ask about email security..." className="bg-secondary/50 text-xs h-8" disabled={loading} />
+              <Input value={input} onChange={(e) => setInput(e.target.value)} placeholder="Ask about security..." className="bg-secondary/50 text-xs h-8" disabled={loading} />
               <Button type="submit" size="icon" disabled={loading || !input.trim()} className="shrink-0 h-8 w-8">
                 <Send className="h-3 w-3" />
               </Button>
@@ -130,12 +143,12 @@ export function FloatingAIBot() {
         )}
       </AnimatePresence>
 
-      {/* Floating button */}
+      {/* Floating button - bottom left */}
       <motion.button
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setOpen(!open)}
-        className="fixed bottom-4 right-4 z-50 w-12 h-12 rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/30 flex items-center justify-center hover:shadow-primary/50 transition-shadow"
+        className="fixed bottom-4 left-4 z-50 w-12 h-12 rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/30 flex items-center justify-center hover:shadow-primary/50 transition-shadow"
       >
         {open ? <X className="h-5 w-5" /> : <MessageSquare className="h-5 w-5" />}
       </motion.button>

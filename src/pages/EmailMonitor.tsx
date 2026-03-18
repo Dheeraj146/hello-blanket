@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Mail, MailWarning, ShieldAlert, ArrowUpRight, ArrowDownLeft, Paperclip } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
+import { FeatureExplanationDialog } from "@/components/FeatureExplanation";
 
 interface DomainEmail {
   id: string;
@@ -36,7 +37,7 @@ const STATUS_COLORS: Record<string, string> = {
   failed: "bg-destructive/20 text-destructive border-destructive/30",
 };
 
-const PIE_COLORS = ["hsl(142,76%,45%)", "hsl(38,92%,50%)", "hsl(270,76%,55%)", "hsl(0,72%,51%)", "hsl(220,10%,50%)"];
+const PIE_COLORS = ["hsl(0,72%,51%)", "hsl(142,76%,45%)", "hsl(38,92%,50%)", "hsl(270,76%,55%)", "hsl(220,10%,50%)"];
 
 function formatBytes(bytes: number | null) {
   if (!bytes) return "—";
@@ -53,13 +54,8 @@ export default function EmailMonitor() {
   const [protocolFilter, setProtocolFilter] = useState("all");
 
   useEffect(() => {
-    supabase
-      .from("domain_emails")
-      .select("*")
-      .order("created_at", { ascending: false })
-      .then(({ data }) => {
-        if (data) setEmails(data as DomainEmail[]);
-      });
+    supabase.from("domain_emails").select("*").order("created_at", { ascending: false })
+      .then(({ data }) => { if (data) setEmails(data as DomainEmail[]); });
   }, []);
 
   const filtered = emails.filter((e) => {
@@ -80,12 +76,10 @@ export default function EmailMonitor() {
   const blocked = emails.filter((e) => e.status === "blocked").length;
   const quarantined = emails.filter((e) => e.status === "quarantined").length;
 
-  // Protocol distribution
   const protocolCounts: Record<string, number> = {};
   emails.forEach((e) => { protocolCounts[e.protocol] = (protocolCounts[e.protocol] || 0) + 1; });
   const protocolData = Object.entries(protocolCounts).map(([name, value]) => ({ name, value }));
 
-  // Status distribution
   const statusCounts: Record<string, number> = {};
   emails.forEach((e) => { statusCounts[e.status] = (statusCounts[e.status] || 0) + 1; });
   const statusData = Object.entries(statusCounts).map(([name, count]) => ({ name, count }));
@@ -101,12 +95,14 @@ export default function EmailMonitor() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Email Security Monitor</h1>
-        <p className="text-sm text-muted-foreground">Real-time email tracking for <span className="font-mono text-primary">telesoft.com</span> across SMTP, IMAP, Exchange</p>
+      <div className="flex items-center gap-2">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Email Security Monitor</h1>
+          <p className="text-sm text-muted-foreground">Real-time email tracking for <span className="font-mono text-primary">telesoft.com</span></p>
+        </div>
+        <FeatureExplanationDialog featureKey="email-monitoring" />
       </div>
 
-      {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         {stats.map((s) => (
           <Card key={s.label} className="bg-card border-border/50 cyber-gradient">
@@ -123,18 +119,17 @@ export default function EmailMonitor() {
         ))}
       </div>
 
-      {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <Card className="bg-card border-border/50">
           <CardHeader className="pb-2"><CardTitle className="text-sm font-mono">Email Status Distribution</CardTitle></CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={statusData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(220,15%,14%)" />
-                <XAxis dataKey="name" tick={{ fontSize: 10, fill: "hsl(220,10%,50%)" }} />
-                <YAxis tick={{ fontSize: 10, fill: "hsl(220,10%,50%)" }} />
-                <Tooltip contentStyle={{ background: "hsl(220,18%,7%)", border: "1px solid hsl(220,15%,14%)", borderRadius: 8, fontSize: 12 }} />
-                <Bar dataKey="count" fill="hsl(174,100%,42%)" radius={[4, 4, 0, 0]} />
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <XAxis dataKey="name" tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} />
+                <YAxis tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} />
+                <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }} />
+                <Bar dataKey="count" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
@@ -148,7 +143,7 @@ export default function EmailMonitor() {
                 <Pie data={protocolData} cx="50%" cy="50%" innerRadius={45} outerRadius={75} paddingAngle={4} dataKey="value">
                   {protocolData.map((_, i) => <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />)}
                 </Pie>
-                <Tooltip contentStyle={{ background: "hsl(220,18%,7%)", border: "1px solid hsl(220,15%,14%)", borderRadius: 8, fontSize: 12 }} />
+                <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }} />
               </PieChart>
             </ResponsiveContainer>
             <div className="flex flex-wrap gap-2 justify-center">
@@ -163,7 +158,6 @@ export default function EmailMonitor() {
         </Card>
       </div>
 
-      {/* Filters */}
       <div className="flex gap-3 flex-wrap">
         <Input placeholder="Search sender, recipient, subject..." value={search} onChange={(e) => setSearch(e.target.value)} className="max-w-xs bg-secondary/50" />
         <Select value={directionFilter} onValueChange={setDirectionFilter}>
@@ -197,7 +191,6 @@ export default function EmailMonitor() {
         </Select>
       </div>
 
-      {/* Email Log Table */}
       <Card className="bg-card border-border/50">
         <CardContent className="p-0">
           <Table>

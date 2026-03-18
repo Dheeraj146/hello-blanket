@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { SeverityBadge } from "@/components/SeverityBadge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { FeatureExplanationDialog } from "@/components/FeatureExplanation";
 import type { Tables } from "@/integrations/supabase/types";
 
 export default function Threats() {
@@ -24,9 +25,12 @@ export default function Threats() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Threat Landscape</h1>
-        <p className="text-sm text-muted-foreground">Active and resolved threat intelligence</p>
+      <div className="flex items-center gap-2">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Threat Landscape</h1>
+          <p className="text-sm text-muted-foreground">Active and resolved threat intelligence</p>
+        </div>
+        <FeatureExplanationDialog featureKey="threat-detection" />
       </div>
       <div className="flex gap-3 flex-wrap">
         <Input placeholder="Search threats..." value={search} onChange={(e) => setSearch(e.target.value)} className="max-w-xs bg-secondary/50" />
@@ -62,7 +66,7 @@ export default function Threats() {
                   <TableCell className="font-medium">{a.title}</TableCell>
                   <TableCell className="text-muted-foreground font-mono text-xs">{a.source || "—"}</TableCell>
                   <TableCell className="text-muted-foreground text-xs">{new Date(a.detected_at).toLocaleString()}</TableCell>
-                  <TableCell>{a.resolved ? <span className="text-cyber-green text-xs">Resolved</span> : <span className="text-cyber-red text-xs">Active</span>}</TableCell>
+                  <TableCell>{a.resolved ? <span className="text-cyber-green text-xs">Resolved</span> : <span className="text-destructive text-xs">Active</span>}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

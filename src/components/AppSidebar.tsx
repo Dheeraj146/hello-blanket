@@ -45,7 +45,7 @@ export function AppSidebar() {
           {!collapsed && (
             <div className="flex flex-col">
               <span className="text-sm font-bold tracking-wider text-primary cyber-glow-text">NAZAR</span>
-              <span className="text-[10px] text-muted-foreground">Email Security Monitor</span>
+              <span className="text-[10px] text-muted-foreground">Zero Trust Monitor</span>
             </div>
           )}
         </div>
