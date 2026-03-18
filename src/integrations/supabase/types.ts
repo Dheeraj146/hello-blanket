@@ -41,6 +41,63 @@ export type Database = {
         }
         Relationships: []
       }
+      domain_emails: {
+        Row: {
+          created_at: string
+          direction: string
+          domain: string
+          has_attachment: boolean | null
+          id: string
+          ip_address: string | null
+          message_id: string | null
+          protocol: string
+          recipient: string
+          sender: string
+          size_bytes: number | null
+          spam_score: number | null
+          status: string
+          subject: string | null
+          threat_detected: boolean | null
+          threat_type: string | null
+        }
+        Insert: {
+          created_at?: string
+          direction?: string
+          domain?: string
+          has_attachment?: boolean | null
+          id?: string
+          ip_address?: string | null
+          message_id?: string | null
+          protocol?: string
+          recipient: string
+          sender: string
+          size_bytes?: number | null
+          spam_score?: number | null
+          status?: string
+          subject?: string | null
+          threat_detected?: boolean | null
+          threat_type?: string | null
+        }
+        Update: {
+          created_at?: string
+          direction?: string
+          domain?: string
+          has_attachment?: boolean | null
+          id?: string
+          ip_address?: string | null
+          message_id?: string | null
+          protocol?: string
+          recipient?: string
+          sender?: string
+          size_bytes?: number | null
+          spam_score?: number | null
+          status?: string
+          subject?: string | null
+          threat_detected?: boolean | null
+          threat_type?: string | null
+        }
+        Relationships: []
+      }
       endpoints: {
         Row: {
           agent_version: string | null

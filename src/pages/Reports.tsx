@@ -20,7 +20,7 @@ export default function Reports() {
       title: report.title,
       type: report.type,
       generatedAt: new Date(report.created_at).toLocaleString(),
-      summary: (data.summary as string) || `Auto-generated ${report.type} report from Cyber Eye monitoring system.`,
+      summary: (data.summary as string) || `Auto-generated ${report.type} report from NAZAR monitoring system.`,
       tableHeaders: (data.headers as string[]) || ["Metric", "Value"],
       tableRows: (data.rows as string[][]) || [["Total Events", "—"], ["Critical", "—"], ["Resolved", "—"]],
     });

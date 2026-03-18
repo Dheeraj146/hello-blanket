@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Eye, Loader2 } from "lucide-react";
+import { Shield, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 export default function ResetPassword() {
@@ -48,7 +48,7 @@ export default function ResetPassword() {
       <Card className="w-full max-w-md bg-card/80 border-border/50">
         <CardHeader className="text-center">
           <div className="flex items-center justify-center gap-2 mb-2">
-            <Eye className="w-6 h-6 text-primary" />
+            <Shield className="w-6 h-6 text-primary" />
           </div>
           <h1 className="text-xl font-bold">Set New Password</h1>
         </CardHeader>

@@ -19,10 +19,10 @@ export function generateReportPDF(data: ReportData) {
   doc.setTextColor(0, 210, 178);
   doc.setFontSize(20);
   doc.setFont("helvetica", "bold");
-  doc.text("CYBER EYE", 14, 18);
+  doc.text("NAZAR", 14, 18);
   doc.setFontSize(10);
   doc.setTextColor(150, 160, 170);
-  doc.text("Zero Trust Monitoring Dashboard", 14, 26);
+  doc.text("Email Security Monitoring Dashboard", 14, 26);
   doc.setFontSize(8);
   doc.text(`Generated: ${data.generatedAt}`, 14, 34);
 
@@ -61,7 +61,7 @@ export function generateReportPDF(data: ReportData) {
     doc.setPage(i);
     doc.setFontSize(7);
     doc.setTextColor(150, 150, 150);
-    doc.text(`Cyber Eye - Confidential | Page ${i} of ${pageCount}`, 14, 287);
+    doc.text(`NAZAR - Confidential | Page ${i} of ${pageCount}`, 14, 287);
   }
 
   doc.save(`${data.title.replace(/\s+/g, "_")}_${Date.now()}.pdf`);
