@@ -13,18 +13,31 @@ interface ReportData {
 export function generateReportPDF(data: ReportData) {
   const doc = new jsPDF();
 
-  // Header
+  // Header - dark black background
   doc.setFillColor(10, 15, 20);
   doc.rect(0, 0, 210, 40, "F");
-  doc.setTextColor(0, 210, 178);
-  doc.setFontSize(20);
+  
+  // Red accent line
+  doc.setFillColor(220, 38, 38);
+  doc.rect(0, 40, 210, 1.5, "F");
+
+  // NAZAR title in red
+  doc.setTextColor(220, 38, 38);
+  doc.setFontSize(22);
   doc.setFont("helvetica", "bold");
   doc.text("NAZAR", 14, 18);
-  doc.setFontSize(10);
+
+  // Tagline
+  doc.setFontSize(9);
   doc.setTextColor(150, 160, 170);
-  doc.text("Email Security Monitoring Dashboard", 14, 26);
+  doc.text("Zero Trust Monitoring Dashboard", 14, 26);
   doc.setFontSize(8);
   doc.text(`Generated: ${data.generatedAt}`, 14, 34);
+
+  // Classification badge
+  doc.setFontSize(7);
+  doc.setTextColor(220, 38, 38);
+  doc.text("CONFIDENTIAL", 170, 18);
 
   // Title
   doc.setTextColor(40, 40, 40);
@@ -49,19 +62,23 @@ export function generateReportPDF(data: ReportData) {
       head: [data.tableHeaders],
       body: data.tableRows,
       theme: "grid",
-      headStyles: { fillColor: [0, 170, 140], textColor: [255, 255, 255], fontSize: 8 },
-      bodyStyles: { fontSize: 7 },
-      alternateRowStyles: { fillColor: [245, 247, 250] },
+      headStyles: { fillColor: [220, 38, 38], textColor: [255, 255, 255], fontSize: 8, fontStyle: "bold" },
+      bodyStyles: { fontSize: 7, textColor: [40, 40, 40] },
+      alternateRowStyles: { fillColor: [245, 245, 245] },
+      styles: { cellPadding: 3, lineColor: [200, 200, 200], lineWidth: 0.25 },
     });
   }
 
-  // Footer
+  // Footer on every page
   const pageCount = doc.getNumberOfPages();
   for (let i = 1; i <= pageCount; i++) {
     doc.setPage(i);
+    // Footer line
+    doc.setFillColor(220, 38, 38);
+    doc.rect(14, 283, 182, 0.5, "F");
     doc.setFontSize(7);
     doc.setTextColor(150, 150, 150);
-    doc.text(`NAZAR - Confidential | Page ${i} of ${pageCount}`, 14, 287);
+    doc.text(`NAZAR - Zero Trust Monitoring | Confidential | Page ${i} of ${pageCount}`, 14, 288);
   }
 
   doc.save(`${data.title.replace(/\s+/g, "_")}_${Date.now()}.pdf`);
