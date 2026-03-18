@@ -22,7 +22,7 @@ export function generateReportPDF(data: ReportData) {
   doc.text("NAZAR", 14, 18);
   doc.setFontSize(10);
   doc.setTextColor(150, 160, 170);
-  doc.text("Zero Trust Monitoring Dashboard", 14, 26);
+  doc.text("Email Security Monitoring Dashboard", 14, 26);
   doc.setFontSize(8);
   doc.text(`Generated: ${data.generatedAt}`, 14, 34);
 
