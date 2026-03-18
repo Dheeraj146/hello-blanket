@@ -1,13 +1,13 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Eye, Shield, Server, BarChart3, Bot, Lock } from "lucide-react";
+import { Shield, Mail, Server, BarChart3, Lock, ShieldAlert } from "lucide-react";
 import { motion } from "framer-motion";
 
 const features = [
-  { icon: Shield, title: "Zero Trust Security", desc: "Continuous verification of every user, device, and connection" },
-  { icon: Server, title: "Endpoint Monitoring", desc: "Real-time surveillance of all network endpoints" },
+  { icon: Mail, title: "Email Monitoring", desc: "Track all sent & received emails across SMTP, IMAP, and Exchange protocols" },
+  { icon: ShieldAlert, title: "Threat Detection", desc: "Real-time phishing, spam, malware, and spoofing detection" },
+  { icon: Server, title: "Endpoint Monitoring", desc: "Continuous surveillance of all network endpoints" },
   { icon: BarChart3, title: "Analytics & Reports", desc: "Comprehensive security analytics with PDF exports" },
-  { icon: Bot, title: "AI Security Assistant", desc: "NVIDIA-powered AI for threat analysis guidance" },
   { icon: Lock, title: "Role-Based Access", desc: "Admin, analyst, and viewer role controls" },
 ];
 
@@ -23,8 +23,8 @@ export default function Index() {
 
       <header className="relative z-10 flex items-center justify-between p-6 max-w-6xl mx-auto">
         <div className="flex items-center gap-2">
-          <Eye className="h-6 w-6 text-primary" />
-          <span className="font-bold tracking-wider text-primary cyber-glow-text">CYBER EYE</span>
+          <Shield className="h-6 w-6 text-primary" />
+          <span className="font-bold tracking-wider text-primary cyber-glow-text">NAZAR</span>
         </div>
         <Button onClick={() => navigate("/login")} variant="outline" className="border-primary/30 hover:bg-primary/10">
           Sign In
@@ -34,11 +34,11 @@ export default function Index() {
       <main className="relative z-10 max-w-6xl mx-auto px-6 pt-20 pb-32 text-center">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
           <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-4">
-            <span className="text-primary cyber-glow-text">Zero Trust</span>{" "}
-            <span className="text-foreground">Monitoring</span>
+            <span className="text-primary cyber-glow-text">Email Security</span>{" "}
+            <span className="text-foreground">Monitor</span>
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
-            Enterprise-grade cybersecurity dashboard with real-time threat detection, endpoint monitoring, and AI-powered analysis.
+            Enterprise-grade email security monitoring with real-time threat detection, protocol analysis, and AI-powered insights for your domain.
           </p>
           <div className="flex gap-3 justify-center">
             <Button size="lg" onClick={() => navigate("/login")} className="font-semibold">

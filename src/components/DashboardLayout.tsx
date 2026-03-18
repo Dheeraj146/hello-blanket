@@ -1,5 +1,6 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
+import { FloatingAIBot } from "@/components/FloatingAIBot";
 import { Outlet } from "react-router-dom";
 
 export function DashboardLayout() {
@@ -21,6 +22,7 @@ export function DashboardLayout() {
           </main>
         </div>
       </div>
+      <FloatingAIBot />
     </SidebarProvider>
   );
 }

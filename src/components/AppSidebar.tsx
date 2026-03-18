@@ -1,6 +1,6 @@
 import {
   Shield, LayoutDashboard, AlertTriangle, Server, FileText, BarChart3,
-  Bot, Settings, LogOut, Eye
+  Mail, Settings, LogOut
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
@@ -15,11 +15,11 @@ import { Button } from "@/components/ui/button";
 
 const mainItems = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
+  { title: "Email Monitor", url: "/email-monitor", icon: Mail },
   { title: "Threats", url: "/threats", icon: AlertTriangle },
   { title: "Endpoints", url: "/endpoints", icon: Server },
   { title: "Reports", url: "/reports", icon: FileText },
   { title: "Analytics", url: "/analytics", icon: BarChart3 },
-  { title: "AI Assistant", url: "/chatbot", icon: Bot },
 ];
 
 const adminItems = [
@@ -40,12 +40,12 @@ export function AppSidebar() {
       <SidebarHeader className="border-b border-border pb-4">
         <div className="flex items-center gap-2 px-2">
           <div className="flex items-center justify-center w-8 h-8 rounded-md bg-primary/10">
-            <Eye className="w-5 h-5 text-primary" />
+            <Shield className="w-5 h-5 text-primary" />
           </div>
           {!collapsed && (
             <div className="flex flex-col">
-              <span className="text-sm font-bold tracking-wider text-primary cyber-glow-text">CYBER EYE</span>
-              <span className="text-[10px] text-muted-foreground">Zero Trust Monitor</span>
+              <span className="text-sm font-bold tracking-wider text-primary cyber-glow-text">NAZAR</span>
+              <span className="text-[10px] text-muted-foreground">Email Security Monitor</span>
             </div>
           )}
         </div>

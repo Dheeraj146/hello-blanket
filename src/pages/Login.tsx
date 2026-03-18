@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Eye, Shield, Loader2 } from "lucide-react";
+import { Shield, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 export default function Login() {
@@ -52,12 +52,12 @@ export default function Login() {
         <CardHeader className="text-center space-y-4">
           <div className="flex items-center justify-center gap-2">
             <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10 cyber-glow">
-              <Eye className="w-6 h-6 text-primary" />
+              <Shield className="w-6 h-6 text-primary" />
             </div>
           </div>
           <div>
-            <h1 className="text-2xl font-bold tracking-wider text-primary cyber-glow-text">CYBER EYE</h1>
-            <p className="text-sm text-muted-foreground mt-1">Zero Trust Monitoring Dashboard</p>
+            <h1 className="text-2xl font-bold tracking-wider text-primary cyber-glow-text">NAZAR</h1>
+            <p className="text-sm text-muted-foreground mt-1">Email Security Monitoring Dashboard</p>
           </div>
         </CardHeader>
 

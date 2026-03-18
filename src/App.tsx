@@ -16,7 +16,7 @@ import Endpoints from "./pages/Endpoints";
 import Reports from "./pages/Reports";
 import Analytics from "./pages/Analytics";
 import Admin from "./pages/Admin";
-import Chatbot from "./pages/Chatbot";
+import EmailMonitor from "./pages/EmailMonitor";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -35,11 +35,11 @@ const App = () => (
 
             <Route element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
               <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/email-monitor" element={<EmailMonitor />} />
               <Route path="/threats" element={<Threats />} />
               <Route path="/endpoints" element={<Endpoints />} />
               <Route path="/reports" element={<Reports />} />
               <Route path="/analytics" element={<Analytics />} />
-              <Route path="/chatbot" element={<Chatbot />} />
               <Route path="/admin" element={<ProtectedRoute adminOnly><Admin /></ProtectedRoute>} />
             </Route>
 
