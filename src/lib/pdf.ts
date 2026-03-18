@@ -19,7 +19,7 @@ export function generateReportPDF(data: ReportData) {
   doc.setTextColor(0, 210, 178);
   doc.setFontSize(20);
   doc.setFont("helvetica", "bold");
-  doc.text("CYBER EYE", 14, 18);
+  doc.text("NAZAR", 14, 18);
   doc.setFontSize(10);
   doc.setTextColor(150, 160, 170);
   doc.text("Zero Trust Monitoring Dashboard", 14, 26);
