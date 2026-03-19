@@ -19,7 +19,7 @@ export default function Analytics() {
     const d = new Date(); d.setDate(d.getDate() - (13 - i));
     const day = d.toLocaleDateString("en", { month: "short", day: "numeric" });
     const count = events.filter((e) => new Date(e.created_at).toDateString() === d.toDateString()).length;
-    return { day, events: count || Math.floor(Math.random() * 15 + 2) };
+    return { day, events: count };
   });
 
   return (
