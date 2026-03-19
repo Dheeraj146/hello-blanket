@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Shield, Mail, Server, BarChart3, Lock, ShieldAlert, Sun, Moon } from "lucide-react";
 import { motion } from "framer-motion";
 import { FloatingAIBot } from "@/components/FloatingAIBot";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 const features = [
   { icon: Mail, title: "Email Monitoring", desc: "Track all sent & received emails across SMTP, IMAP, and Exchange protocols", link: "/features/email-monitoring" },
