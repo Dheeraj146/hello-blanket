@@ -42,7 +42,7 @@ export default function Endpoints() {
             </TableHeader>
             <TableBody>
               {filtered.length === 0 ? (
-                <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-8">No endpoints found</TableCell></TableRow>
+                <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-8">No endpoints yet — configure endpoints in the Admin Panel to start monitoring</TableCell></TableRow>
               ) : filtered.map((ep) => (
                 <TableRow key={ep.id}>
                   <TableCell><EndpointStatusBadge status={ep.status} /></TableCell>

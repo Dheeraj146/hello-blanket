@@ -31,7 +31,7 @@ export default function Dashboard() {
     const d = new Date(); d.setDate(d.getDate() - (6 - i));
     const day = d.toLocaleDateString("en", { weekday: "short" });
     const count = events.filter((e) => new Date(e.created_at).toDateString() === d.toDateString()).length;
-    return { day, events: count || Math.floor(Math.random() * 10 + 1) };
+    return { day, events: count };
   });
 
   const stats = [

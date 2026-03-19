@@ -13,27 +13,36 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 
-const mainItems = [
-  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
-  { title: "Email Monitor", url: "/email-monitor", icon: Mail },
-  { title: "Threats", url: "/threats", icon: AlertTriangle },
-  { title: "Endpoints", url: "/endpoints", icon: Server },
-  { title: "Reports", url: "/reports", icon: FileText },
-  { title: "Analytics", url: "/analytics", icon: BarChart3 },
+const allNavItems = [
+  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard, minRole: "viewer" },
+  { title: "Email Monitor", url: "/email-monitor", icon: Mail, minRole: "viewer" },
+  { title: "Threats", url: "/threats", icon: AlertTriangle, minRole: "viewer" },
+  { title: "Endpoints", url: "/endpoints", icon: Server, minRole: "viewer" },
+  { title: "Reports", url: "/reports", icon: FileText, minRole: "supervisor" },
+  { title: "Analytics", url: "/analytics", icon: BarChart3, minRole: "supervisor" },
 ];
 
-const adminItems = [
-  { title: "Admin Panel", url: "/admin", icon: Settings },
-];
+const roleHierarchy: Record<string, number> = {
+  viewer: 0,
+  analyst: 1,
+  supervisor: 2,
+  admin: 3,
+};
 
 export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const location = useLocation();
-  const { profile, isAdmin, signOut, user } = useAuth();
+  const { profile, isAdmin, roles, signOut, user } = useAuth();
 
   const isActive = (path: string) => location.pathname === path;
   const initials = profile?.display_name?.slice(0, 2).toUpperCase() || user?.email?.slice(0, 2).toUpperCase() || "U";
+
+  // Get highest role level
+  const userRoleLevel = Math.max(0, ...roles.map((r) => roleHierarchy[r] ?? 0));
+  const userRoleLabel = isAdmin ? "Admin" : roles.includes("supervisor") ? "Supervisor" : roles.includes("analyst") ? "Analyst" : "Viewer";
+
+  const visibleItems = allNavItems.filter((item) => userRoleLevel >= (roleHierarchy[item.minRole] ?? 0));
 
   return (
     <Sidebar collapsible="icon">
@@ -56,7 +65,7 @@ export function AppSidebar() {
           <SidebarGroupLabel>Navigation</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {mainItems.map((item) => (
+              {visibleItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild isActive={isActive(item.url)} tooltip={item.title}>
                     <NavLink to={item.url} end className="hover:bg-muted/50" activeClassName="bg-primary/10 text-primary font-medium">
@@ -75,16 +84,14 @@ export function AppSidebar() {
             <SidebarGroupLabel>Administration</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
-                {adminItems.map((item) => (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild isActive={isActive(item.url)} tooltip={item.title}>
-                      <NavLink to={item.url} end className="hover:bg-muted/50" activeClassName="bg-primary/10 text-primary font-medium">
-                        <item.icon className="h-4 w-4" />
-                        {!collapsed && <span>{item.title}</span>}
-                      </NavLink>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild isActive={isActive("/admin")} tooltip="Admin Panel">
+                    <NavLink to="/admin" end className="hover:bg-muted/50" activeClassName="bg-primary/10 text-primary font-medium">
+                      <Settings className="h-4 w-4" />
+                      {!collapsed && <span>Admin Panel</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
@@ -99,7 +106,7 @@ export function AppSidebar() {
           {!collapsed && (
             <div className="flex-1 min-w-0">
               <p className="text-xs font-medium truncate">{profile?.display_name || user?.email}</p>
-              <p className="text-[10px] text-muted-foreground truncate">{isAdmin ? "Admin" : "Analyst"}</p>
+              <p className="text-[10px] text-muted-foreground truncate">{userRoleLabel}</p>
             </div>
           )}
           {!collapsed && (

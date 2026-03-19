@@ -209,7 +209,7 @@ export default function EmailMonitor() {
             </TableHeader>
             <TableBody>
               {filtered.length === 0 ? (
-                <TableRow><TableCell colSpan={9} className="text-center text-muted-foreground py-8">No emails found</TableCell></TableRow>
+                <TableRow><TableCell colSpan={9} className="text-center text-muted-foreground py-8">No email data yet — configure email servers in the Admin Panel to start monitoring</TableCell></TableRow>
               ) : filtered.map((e) => (
                 <TableRow key={e.id} className={e.threat_detected ? "bg-destructive/5" : ""}>
                   <TableCell>

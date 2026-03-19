@@ -98,6 +98,90 @@ export type Database = {
         }
         Relationships: []
       }
+      email_server_configs: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          encrypted_password: string
+          host: string
+          id: string
+          is_active: boolean
+          last_scan_at: string | null
+          name: string
+          port: number
+          protocol: string
+          use_tls: boolean
+          username: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          encrypted_password: string
+          host: string
+          id?: string
+          is_active?: boolean
+          last_scan_at?: string | null
+          name: string
+          port?: number
+          protocol?: string
+          use_tls?: boolean
+          username: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          encrypted_password?: string
+          host?: string
+          id?: string
+          is_active?: boolean
+          last_scan_at?: string | null
+          name?: string
+          port?: number
+          protocol?: string
+          use_tls?: boolean
+          username?: string
+        }
+        Relationships: []
+      }
+      endpoint_configs: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          hostname: string
+          id: string
+          ip_address: string
+          is_active: boolean
+          last_scan_at: string | null
+          monitor_type: string
+          os: string | null
+          scan_interval_minutes: number
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          hostname: string
+          id?: string
+          ip_address: string
+          is_active?: boolean
+          last_scan_at?: string | null
+          monitor_type?: string
+          os?: string | null
+          scan_interval_minutes?: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          hostname?: string
+          id?: string
+          ip_address?: string
+          is_active?: boolean
+          last_scan_at?: string | null
+          monitor_type?: string
+          os?: string | null
+          scan_interval_minutes?: number
+        }
+        Relationships: []
+      }
       endpoints: {
         Row: {
           agent_version: string | null
@@ -305,7 +389,7 @@ export type Database = {
       is_admin: { Args: never; Returns: boolean }
     }
     Enums: {
-      app_role: "admin" | "analyst" | "viewer"
+      app_role: "admin" | "analyst" | "viewer" | "supervisor"
       endpoint_status: "secure" | "warning" | "critical" | "offline"
       event_status: "open" | "investigating" | "resolved" | "dismissed"
       severity_level: "critical" | "high" | "medium" | "low"
@@ -436,7 +520,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "analyst", "viewer"],
+      app_role: ["admin", "analyst", "viewer", "supervisor"],
       endpoint_status: ["secure", "warning", "critical", "offline"],
       event_status: ["open", "investigating", "resolved", "dismissed"],
       severity_level: ["critical", "high", "medium", "low"],
