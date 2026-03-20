@@ -1,136 +1,141 @@
 
 
-# Plan: Transform NAZAR into a Real Operational Security Monitoring Platform
+# Plan: AI Bot Position, Admin Fixes, Edit Capabilities, Endpoint Monitoring Rethink, and Threat Intel Integration
 
-## Overview
+## Summary
 
-The current app has static/seed data. The user wants a real tool where they configure monitoring sources (email servers, network endpoints) and the system collects actual data. The app will run locally on their network. Public visitors see only the explanation/landing pages.
-
----
-
-## Architecture
-
-```text
-Admin Dashboard
-  ├── User Management (create accounts, assign roles: user/supervisor/admin)
-  ├── Email Server Config (add IMAP/SMTP/POP3 servers with host, port, credentials)
-  ├── Endpoint Config (add network IPs/hostnames to monitor)
-  └── All data starts empty — populated only from configured sources
-
-Edge Functions (backend)
-  ├── email-scanner: connects to configured email servers, fetches headers/metadata, stores in domain_emails, flags threats
-  ├── endpoint-scanner: pings/probes configured IPs, collects status, stores in endpoints table
-  └── threat-analyzer: analyzes collected data for anomalies, creates threat_alerts
-
-Dashboard pages read from these tables (already built, just need real data flow)
-```
+11 areas of work addressing UI fixes, admin functionality, endpoint monitoring architecture, and threat intelligence API integration.
 
 ---
 
-## Database Changes (New Tables)
+## 1. Move AI Bot to Bottom-Right with Draggable Option
 
-### 1. `email_server_configs` — stores IMAP/SMTP/POP3 server connections
-- `id`, `name`, `protocol` (IMAP/SMTP/POP3/Exchange), `host`, `port`, `username`, `encrypted_password`, `use_tls`, `is_active`, `last_scan_at`, `created_by` (uuid), `created_at`
-- RLS: admin-only CRUD
+**FloatingAIBot.tsx:**
+- Change `left-4` to `right-4` for both the button and panel
+- Change panel from `bottom-20 left-4` to `bottom-20 right-4`
+- Add simple drag support: use `react-draggable` or a custom drag handler so the bot icon can be repositioned by the user if it overlaps content
 
-### 2. `endpoint_configs` — stores network IPs/hosts to monitor  
-- `id`, `hostname`, `ip_address`, `os`, `monitor_type` (ping/ssh/agent), `is_active`, `scan_interval_minutes`, `last_scan_at`, `created_by` (uuid), `created_at`
-- RLS: admin-only CRUD
-
-### 3. `managed_users` — admin creates user accounts with role assignments
-- Uses existing `profiles` + `user_roles` tables. Admin page gets a "Create User" form that calls the `create-admin` edge function pattern (service role signup).
-
-### 4. Update `app_role` enum
-- Add `supervisor` role: ALTER TYPE app_role ADD VALUE 'supervisor'
-
-### 5. Clear seed data
-- DELETE all rows from `domain_emails`, `threat_alerts`, `endpoints`, `security_events`, `reports` so tables start empty
+**Files:** `src/components/FloatingAIBot.tsx`
 
 ---
 
-## New Edge Functions
+## 2. System Uptime — Show Application Uptime
 
-### `email-scanner/index.ts`
-- Called on-demand or scheduled by admin
-- Reads `email_server_configs` (active ones) using service role
-- Connects to IMAP/POP3 servers, fetches recent email headers (from, to, subject, date, size, attachments)
-- Analyzes for threats (phishing keywords, suspicious domains, spam scoring)
-- Inserts results into `domain_emails` and creates `threat_alerts` for detected threats
-- Note: Real IMAP connection requires network access — this will work when running locally. On Lovable preview, it will show connection errors (expected).
+The "99.97%" is hardcoded. Change it to reflect actual application uptime (calculated from when the app was first deployed or the earliest security event). If no data exists, show "N/A" or "—". This is the application's own uptime, not endpoint uptime.
 
-### `endpoint-scanner/index.ts`
-- Reads `endpoint_configs` (active ones)
-- Attempts to reach each IP/hostname (HTTP probe or TCP check)
-- Updates `endpoints` table with status (secure/warning/critical/offline), last_seen
-- Creates `security_events` for status changes
-- Same local-network caveat applies
-
-### `manage-users/index.ts`
-- Admin-only edge function using service role
-- Create user accounts (email + password + display name + role)
-- Update user roles
-- Disable/delete user accounts
+**Files:** `src/pages/Dashboard.tsx` (line 38)
 
 ---
 
-## UI Changes
+## 3. Fix Admin Account Creation Login Issue
 
-### Admin Page (`src/pages/Admin.tsx`) — Complete Rebuild with Tabs:
+When a new admin is created via `manage-users` edge function, the user gets `email_confirm: true` so they can log in immediately. However, the issue is likely that newly created admin accounts with the admin role need to be able to sign in using the admin login form. Currently the admin login form hardcodes `admin@nazar.security` — only the primary admin can use it.
 
-1. **Users Tab** (existing, enhanced)
-   - "Create User" button → dialog with email, password, display name, role (user/supervisor/admin)
-   - Role change dropdown per user
-   - Delete user button
+**Fix:** The admin login form should accept any username/email. If the user enters a plain username (no @), treat it as `username@nazar.security`. Otherwise use the email directly. The `manage-users` edge function already assigns roles correctly. The real issue is that created users use normal email auth, so they should use the regular "Sign In" form, not the admin login form.
 
-2. **Email Servers Tab** (new)
-   - Table of configured email servers
-   - "Add Email Server" button → form: name, protocol (IMAP/SMTP/POP3), host, port, username, password, TLS toggle
-   - "Scan Now" button per server → invokes `email-scanner` edge function
-   - Status indicator (last scan time, error state)
+**Clarification in Login UI:** Remove the separate "Admin Login" section. Instead, have a single login form with email + password + Google sign-in. Admins log in with their email just like everyone else. Keep the `admin@nazar.security` / `admin@1234` as the pre-seeded admin, but don't expose these credentials in the UI.
 
-3. **Endpoints Tab** (new)
-   - Table of configured endpoints
-   - "Add Endpoint" button → form: hostname, IP, OS, monitor type
-   - "Scan Now" button → invokes `endpoint-scanner`
-   - Status indicator
-
-4. **Visitor Stats Tab** (existing, kept)
-5. **Audit Logs Tab** (existing, kept)
-
-### Existing Pages — No Major Changes
-- `EmailMonitor.tsx`, `Threats.tsx`, `Endpoints.tsx`, `Reports.tsx`, `Analytics.tsx` already read from the right tables — they'll show data once scanners populate it
-- Remove random data fallbacks in `Dashboard.tsx` and `Analytics.tsx` (lines that use `Math.random()`)
-- Show "No data yet — configure monitoring sources in Admin panel" empty states
-
-### Role-Based Sidebar Visibility
-- `user` role: Dashboard, Email Monitor, Threats, Endpoints (read-only)
-- `supervisor` role: All of user + Reports, Analytics
-- `admin` role: Everything + Admin Panel
-
-### Public vs Authenticated
-- Landing page (`/`) and feature explanation pages remain public
-- All dashboard routes remain behind `ProtectedRoute` (already done)
+**Files:** `src/pages/Login.tsx`
 
 ---
 
-## Files Modified/Created
+## 4. Hide Admin Credentials from Login Page
 
-- **New migration**: `email_server_configs`, `endpoint_configs` tables, add `supervisor` to enum, clear seed data
-- **New edge function**: `supabase/functions/email-scanner/index.ts`
-- **New edge function**: `supabase/functions/endpoint-scanner/index.ts`
-- **New edge function**: `supabase/functions/manage-users/index.ts`
-- **Rewrite**: `src/pages/Admin.tsx` — full admin dashboard with user management, server config, endpoint config tabs
-- **Edit**: `src/components/AppSidebar.tsx` — role-based nav visibility
-- **Edit**: `src/pages/Dashboard.tsx` — remove random data fallbacks
-- **Edit**: `src/pages/Analytics.tsx` — remove random data fallbacks
-- **Edit**: `src/pages/EmailMonitor.tsx` — better empty state
-- **Edit**: `src/pages/Endpoints.tsx` — better empty state
-- **Edit**: `src/contexts/AuthContext.tsx` — expose roles for sidebar filtering
+Remove the "admin?" divider and the "Admin Login" button from the login page. All users (including admins) use the same email + password form. The admin@nazar.security account is internal — not shown in UI.
 
-## Implementation Order
-1. Database migration (new tables, enum update, clear seed data)
-2. Edge functions (manage-users, email-scanner, endpoint-scanner)
-3. Admin page rebuild (user management + server config + endpoint config)
-4. Role-based sidebar filtering
-5. Clean up empty states and random data fallbacks
+Also in the Create User dialog: remove any pre-filled admin info. The form fields should start empty.
+
+**Files:** `src/pages/Login.tsx`
+
+---
+
+## 5. Edit User in Admin Panel (Password Reset, Details Update)
+
+Add an "Edit" button per user row in Admin → Users tab. Opens a dialog with:
+- Update display name
+- Reset password (set new password)
+- Change role
+
+Add a new `update_user` action to `manage-users` edge function that uses `adminClient.auth.admin.updateUserById()` to change password/email/metadata.
+
+**Protect main admin:** The user with email `admin@nazar.security` cannot be deleted. Hide the delete button for this user. Edit (password change, display name) should still work.
+
+**Files:** `src/pages/Admin.tsx`, `supabase/functions/manage-users/index.ts`
+
+---
+
+## 6. Edit Email Servers and Endpoints
+
+Add an "Edit" button (pencil icon) next to each email server and endpoint config row. Opens a pre-filled dialog where admin can update any field. Uses `supabase.from("email_server_configs").update(...)` and `supabase.from("endpoint_configs").update(...)`.
+
+**Files:** `src/pages/Admin.tsx`
+
+---
+
+## 7. Rethink Endpoint Monitoring — Log Collection Architecture
+
+The user does not want simple ping/HTTP probes. They want real endpoint monitoring: system logs, event viewer data, USB device events, Windows Defender alerts, etc.
+
+**Realistic approach for a web app:**
+
+The edge function cannot directly connect to Windows Event Viewer or install agents. Instead, the architecture should support **log ingestion via API/webhook**:
+
+1. **Add `monitor_type` options**: `wazuh`, `suricata`, `siem_webhook`, `windows_event_log`, `custom_api`
+2. **Add API/webhook fields to `endpoint_configs`**: `api_url`, `api_key`, `webhook_secret` — so the admin can configure how to connect to their SIEM/agent
+3. **New edge function `endpoint-log-collector`**: Fetches logs from configured Wazuh API, Suricata API, or any webhook endpoint. Stores parsed events in `security_events`
+4. **Webhook receiver edge function `endpoint-webhook`**: Accepts incoming log data pushed by agents (Wazuh, Suricata, custom scripts) and stores in `security_events`
+
+**Database migration:** Add columns to `endpoint_configs`: `api_url`, `api_key`, `webhook_secret`, `log_source` (wazuh/suricata/event_viewer/custom)
+
+**Files:** Database migration, `supabase/functions/endpoint-log-collector/index.ts` (new), `supabase/functions/endpoint-webhook/index.ts` (new), `src/pages/Admin.tsx` (update endpoint form)
+
+---
+
+## 8. Threat Intelligence API Integration
+
+Store the provided API keys as secrets:
+- `SHODAN_API_KEY`
+- `ABUSEIPDB_API_KEY`
+- `OTX_API_KEY`
+- `IPINFO_TOKEN`
+- `VIRUSTOTAL_API_KEY`
+- `HUNTER_API_KEY`
+- `HIBP_API_KEY`
+- `ZOOMEYE_API_KEY`
+- `SECURITYTRAILS_API_KEY`
+
+Create a new edge function `threat-intel/index.ts` that:
+- Accepts an IP, domain, or email to investigate
+- Queries Shodan (host info, open ports), AbuseIPDB (abuse reports), OTX (threat indicators), VirusTotal (file/URL scan), IPInfo (geo/ASN), Hunter (email verification), HIBP (breach check), ZoomEye (device search), SecurityTrails (DNS history)
+- Returns consolidated threat intelligence report
+- Auto-enriches threat_alerts and security_events with intel data
+
+Add a "Threat Intel" tab or section in the Threats page where admin can look up any IP/domain/email against all configured APIs.
+
+**Files:** `supabase/functions/threat-intel/index.ts` (new), `src/pages/Threats.tsx` (add lookup UI), secrets configuration
+
+---
+
+## 9. Local Network Deployment Notes
+
+The app is already a standard Vite/React app that can run locally. For local deployment:
+- The edge functions run on Lovable Cloud but when self-hosted, they'd run as Supabase Edge Functions locally
+- The webhook endpoint allows local SIEM tools to push data to the cloud database
+- No changes needed to the codebase — it already works via browser
+
+---
+
+## 10. Implementation Order
+
+1. Store threat intel API keys as secrets
+2. Database migration (add endpoint_configs columns, etc.)
+3. Move AI bot to bottom-right with drag
+4. Fix login page (single form, hide admin credentials)
+5. Fix system uptime display
+6. Add edit capabilities to Users, Email Servers, Endpoints tabs
+7. Protect main admin from deletion
+8. Update manage-users edge function with update_user action
+9. Create endpoint-log-collector and endpoint-webhook edge functions
+10. Create threat-intel edge function
+11. Add Threat Intel lookup UI to Threats page
 
