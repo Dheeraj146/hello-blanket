@@ -12,11 +12,24 @@ export default function Dashboard() {
   const [events, setEvents] = useState<Tables<"security_events">[]>([]);
   const [alerts, setAlerts] = useState<Tables<"threat_alerts">[]>([]);
   const [endpoints, setEndpoints] = useState<Tables<"endpoints">[]>([]);
+  const [appUptime, setAppUptime] = useState("—");
 
   useEffect(() => {
     supabase.from("security_events").select("*").order("created_at", { ascending: false }).limit(50).then(({ data }) => data && setEvents(data));
     supabase.from("threat_alerts").select("*").order("detected_at", { ascending: false }).limit(20).then(({ data }) => data && setAlerts(data));
     supabase.from("endpoints").select("*").then(({ data }) => data && setEndpoints(data));
+    
+    // Calculate app uptime from earliest security event
+    supabase.from("security_events").select("created_at").order("created_at", { ascending: true }).limit(1).then(({ data }) => {
+      if (data && data.length > 0) {
+        const earliest = new Date(data[0].created_at);
+        const now = new Date();
+        const diffMs = now.getTime() - earliest.getTime();
+        const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        setAppUptime(`${days}d ${hours}h`);
+      }
+    });
   }, []);
 
   const activeIncidents = alerts.filter((a) => !a.resolved).length;
@@ -35,7 +48,7 @@ export default function Dashboard() {
   });
 
   const stats = [
-    { label: "System Uptime", value: "99.97%", icon: Activity, color: "text-cyber-green" },
+    { label: "App Uptime", value: appUptime, icon: Activity, color: "text-cyber-green" },
     { label: "Active Incidents", value: activeIncidents.toString(), icon: AlertTriangle, color: activeIncidents > 0 ? "text-cyber-red" : "text-cyber-green" },
     { label: "Monitored Endpoints", value: endpoints.length.toString(), icon: Server, color: "text-primary" },
     { label: "Risk Score", value: `${riskScore}%`, icon: Shield, color: riskScore > 50 ? "text-cyber-red" : riskScore > 25 ? "text-cyber-amber" : "text-cyber-green" },
