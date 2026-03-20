@@ -145,6 +145,8 @@ export type Database = {
       }
       endpoint_configs: {
         Row: {
+          api_key: string | null
+          api_url: string | null
           created_at: string
           created_by: string | null
           hostname: string
@@ -152,11 +154,15 @@ export type Database = {
           ip_address: string
           is_active: boolean
           last_scan_at: string | null
+          log_source: string | null
           monitor_type: string
           os: string | null
           scan_interval_minutes: number
+          webhook_secret: string | null
         }
         Insert: {
+          api_key?: string | null
+          api_url?: string | null
           created_at?: string
           created_by?: string | null
           hostname: string
@@ -164,11 +170,15 @@ export type Database = {
           ip_address: string
           is_active?: boolean
           last_scan_at?: string | null
+          log_source?: string | null
           monitor_type?: string
           os?: string | null
           scan_interval_minutes?: number
+          webhook_secret?: string | null
         }
         Update: {
+          api_key?: string | null
+          api_url?: string | null
           created_at?: string
           created_by?: string | null
           hostname?: string
@@ -176,9 +186,11 @@ export type Database = {
           ip_address?: string
           is_active?: boolean
           last_scan_at?: string | null
+          log_source?: string | null
           monitor_type?: string
           os?: string | null
           scan_interval_minutes?: number
+          webhook_secret?: string | null
         }
         Relationships: []
       }
