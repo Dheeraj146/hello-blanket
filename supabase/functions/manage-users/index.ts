@@ -11,7 +11,6 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // Verify caller is admin
     const authHeader = req.headers.get("Authorization");
     if (!authHeader?.startsWith("Bearer ")) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
@@ -25,15 +24,13 @@ Deno.serve(async (req) => {
       global: { headers: { Authorization: authHeader } },
     });
 
-    const token = authHeader.replace("Bearer ", "");
-    const { data: claimsData, error: claimsError } = await userClient.auth.getClaims(token);
-    if (claimsError || !claimsData?.claims) {
+    const { data: { user: caller }, error: userError } = await userClient.auth.getUser();
+    if (userError || !caller) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    const callerId = claimsData.claims.sub;
+    const callerId = caller.id;
 
-    // Check admin role
     const adminClient = createClient(supabaseUrl, serviceRoleKey, {
       auth: { autoRefreshToken: false, persistSession: false },
     });
@@ -60,7 +57,6 @@ Deno.serve(async (req) => {
 
       if (createError) throw createError;
 
-      // Assign role
       await adminClient.from("user_roles").upsert({ user_id: newUser.user.id, role }, { onConflict: "user_id,role" });
 
       return new Response(JSON.stringify({ message: "User created", userId: newUser.user.id }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
@@ -72,17 +68,45 @@ Deno.serve(async (req) => {
         return new Response(JSON.stringify({ error: "user_id and role are required" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       }
 
-      // Delete existing roles and set new one
       await adminClient.from("user_roles").delete().eq("user_id", user_id);
       await adminClient.from("user_roles").insert({ user_id, role });
 
       return new Response(JSON.stringify({ message: "Role updated" }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
+    if (action === "update_user") {
+      const { user_id, display_name, password } = payload;
+      if (!user_id) {
+        return new Response(JSON.stringify({ error: "user_id is required" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+
+      const updateData: any = {};
+      if (password) updateData.password = password;
+      if (display_name !== undefined) updateData.user_metadata = { display_name };
+
+      if (Object.keys(updateData).length > 0) {
+        const { error: updateError } = await adminClient.auth.admin.updateUserById(user_id, updateData);
+        if (updateError) throw updateError;
+      }
+
+      // Also update profile display_name
+      if (display_name !== undefined) {
+        await adminClient.from("profiles").update({ display_name }).eq("user_id", user_id);
+      }
+
+      return new Response(JSON.stringify({ message: "User updated" }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
     if (action === "delete") {
       const { user_id } = payload;
       if (!user_id) {
         return new Response(JSON.stringify({ error: "user_id is required" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+
+      // Protect main admin
+      const { data: userData } = await adminClient.auth.admin.getUserById(user_id);
+      if (userData?.user?.email === "admin@nazar.security") {
+        return new Response(JSON.stringify({ error: "Cannot delete the primary admin account" }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       }
 
       const { error: deleteError } = await adminClient.auth.admin.deleteUser(user_id);

@@ -1,8 +1,8 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Bot, Send, X, User, Loader2, MessageSquare, Trash2 } from "lucide-react";
+import { Bot, Send, X, User, Loader2, MessageSquare, Trash2, GripVertical } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -22,11 +22,34 @@ export function FloatingAIBot() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [dragging, setDragging] = useState(false);
+  const dragStart = useRef({ x: 0, y: 0, posX: 0, posY: 0 });
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages]);
+
+  const onMouseDown = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    setDragging(true);
+    dragStart.current = { x: e.clientX, y: e.clientY, posX: position.x, posY: position.y };
+  }, [position]);
+
+  useEffect(() => {
+    if (!dragging) return;
+    const onMove = (e: MouseEvent) => {
+      setPosition({
+        x: dragStart.current.posX + (e.clientX - dragStart.current.x),
+        y: dragStart.current.posY + (e.clientY - dragStart.current.y),
+      });
+    };
+    const onUp = () => setDragging(false);
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+    return () => { window.removeEventListener("mousemove", onMove); window.removeEventListener("mouseup", onUp); };
+  }, [dragging]);
 
   const sendMessage = async (content: string) => {
     if (!content.trim()) return;
@@ -62,11 +85,18 @@ export function FloatingAIBot() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="fixed bottom-20 left-4 z-50 w-[380px] h-[500px] rounded-xl border border-border bg-card shadow-2xl shadow-primary/10 flex flex-col overflow-hidden"
+            style={{ transform: `translate(${position.x}px, ${position.y}px)` }}
+            className="fixed bottom-20 right-4 z-50 w-[380px] h-[500px] rounded-xl border border-border bg-card shadow-2xl shadow-primary/10 flex flex-col overflow-hidden"
           >
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-secondary/30">
               <div className="flex items-center gap-2">
+                <div
+                  className="w-5 h-5 flex items-center justify-center cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground"
+                  onMouseDown={onMouseDown}
+                >
+                  <GripVertical className="h-4 w-4" />
+                </div>
                 <div className="w-7 h-7 rounded-md bg-primary/10 flex items-center justify-center">
                   <Bot className="h-4 w-4 text-primary" />
                 </div>
@@ -148,12 +178,13 @@ export function FloatingAIBot() {
         )}
       </AnimatePresence>
 
-      {/* Floating button - bottom left */}
+      {/* Floating button - bottom right */}
       <motion.button
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setOpen(!open)}
-        className="fixed bottom-4 left-4 z-50 w-12 h-12 rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/30 flex items-center justify-center hover:shadow-primary/50 transition-shadow"
+        style={{ transform: `translate(${position.x}px, ${position.y}px)` }}
+        className="fixed bottom-4 right-4 z-50 w-12 h-12 rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/30 flex items-center justify-center hover:shadow-primary/50 transition-shadow"
       >
         {open ? <X className="h-5 w-5" /> : <MessageSquare className="h-5 w-5" />}
       </motion.button>
