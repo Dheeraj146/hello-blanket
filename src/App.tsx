@@ -10,6 +10,7 @@ import { DashboardLayout } from "@/components/DashboardLayout";
 
 import Index from "./pages/Index";
 import Login from "./pages/Login";
+import AdminLogin from "./pages/AdminLogin";
 import ResetPassword from "./pages/ResetPassword";
 import Dashboard from "./pages/Dashboard";
 import Threats from "./pages/Threats";
