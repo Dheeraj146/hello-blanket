@@ -39,6 +39,7 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/login" element={<Login />} />
+              <Route path="/admin-login" element={<AdminLogin />} />
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/features/email-monitoring" element={<EmailMonitoringFeature />} />
               <Route path="/features/threat-detection" element={<ThreatDetectionFeature />} />
