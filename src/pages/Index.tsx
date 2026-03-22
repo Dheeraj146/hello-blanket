@@ -43,6 +43,9 @@ export default function Index() {
           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={toggleTheme}>
             {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </Button>
+          <Button onClick={() => navigate("/admin-login")} variant="ghost" size="sm" className="text-muted-foreground hover:text-primary">
+            <Lock className="h-3 w-3 mr-1" /> Admin
+          </Button>
           <Button onClick={() => navigate("/login")} variant="outline" className="border-primary/30 hover:bg-primary/10">
             Sign In
           </Button>
