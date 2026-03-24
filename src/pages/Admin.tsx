@@ -604,12 +604,18 @@ export default function Admin() {
                       <Select value={epLogSource} onValueChange={setEpLogSource}>
                         <SelectTrigger><SelectValue /></SelectTrigger>
                         <SelectContent>
+                          <SelectItem value="windows_event_api">Windows Event API</SelectItem>
                           <SelectItem value="wazuh">Wazuh</SelectItem>
                           <SelectItem value="suricata">Suricata</SelectItem>
                           <SelectItem value="custom_api">Custom API</SelectItem>
                           <SelectItem value="webhook">Webhook (push)</SelectItem>
                         </SelectContent>
                       </Select>
+                      {epLogSource === "windows_event_api" && (
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Run the PowerShell script from WINDOWS_EVENT_COLLECTOR.md on the endpoint. Set API URL to <code className="bg-secondary/50 px-1 rounded">http://&lt;endpoint-ip&gt;:5000/events</code>
+                        </p>
+                      )}
                     </div>
                     <div><Label>API URL (for Wazuh/Suricata/Custom)</Label><Input value={epApiUrl} onChange={(e) => setEpApiUrl(e.target.value)} placeholder="https://wazuh.local:55000" /></div>
                     <div><Label>API Key / Token</Label><Input type="password" value={epApiKey} onChange={(e) => setEpApiKey(e.target.value)} placeholder="Bearer token or API key" /></div>
@@ -637,12 +643,18 @@ export default function Admin() {
                   <Select value={editEpLogSource} onValueChange={setEditEpLogSource}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
+                      <SelectItem value="windows_event_api">Windows Event API</SelectItem>
                       <SelectItem value="wazuh">Wazuh</SelectItem>
                       <SelectItem value="suricata">Suricata</SelectItem>
                       <SelectItem value="custom_api">Custom API</SelectItem>
                       <SelectItem value="webhook">Webhook (push)</SelectItem>
                     </SelectContent>
                   </Select>
+                  {editEpLogSource === "windows_event_api" && (
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Set API URL to <code className="bg-secondary/50 px-1 rounded">http://&lt;endpoint-ip&gt;:5000/events</code>
+                    </p>
+                  )}
                 </div>
                 <div><Label>API URL</Label><Input value={editEpApiUrl} onChange={(e) => setEditEpApiUrl(e.target.value)} /></div>
                 <div><Label>API Key</Label><Input type="password" value={editEpApiKey} onChange={(e) => setEditEpApiKey(e.target.value)} /></div>
